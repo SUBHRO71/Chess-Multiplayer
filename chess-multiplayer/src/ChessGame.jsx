@@ -176,7 +176,7 @@ export default function ChessGame({ user, roomId }) {
       {!started && <p className="waiting">⏳ Waiting for opponent…</p>}
 
       {isCheck && !isGameOver && (
-        <p className="check-warning">⚠️ CHECK! ⚠️</p>
+        <p className="check-warning">!!--CHECK--!!</p>
       )}
 
       {isGameOver && (
