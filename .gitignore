@@ -1,6 +1,6 @@
 # dependencies
 node_modules/
-client/node_modules/
+chess-multiplayer/node_modules/
 backend/node_modules/
 
 # env files
