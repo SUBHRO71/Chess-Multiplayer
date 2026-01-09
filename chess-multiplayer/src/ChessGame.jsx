@@ -14,11 +14,17 @@ export default function ChessGame({ user, roomId }) {
 
   const [whiteTime, setWhiteTime] = useState(300);
   const [blackTime, setBlackTime] = useState(300);
+  const [copied, setCopied] = useState(false);
 
   const timerRef = useRef(null);
   const lastUpdateRef = useRef(Date.now());
 
-  /* ---------------- SOCKET ---------------- */
+  const copyRoomId = async () => {
+    await navigator.clipboard.writeText(roomId);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
   useEffect(() => {
     socket.on("assignColor", setColor);
     socket.on("setMode", setMode);
@@ -57,7 +63,6 @@ export default function ChessGame({ user, roomId }) {
     };
   }, []);
 
-  /* ---------------- TIMER ---------------- */
   useEffect(() => {
     if (!started || mode !== "rapid") {
       clearInterval(timerRef.current);
@@ -91,7 +96,6 @@ export default function ChessGame({ user, roomId }) {
     return () => clearInterval(timerRef.current);
   }, [started, mode, roomId, whiteTime, blackTime]);
 
-  /* ---------------- MOVE HANDLER ---------------- */
   const onPieceDrop = (from, to) => {
     if (!started || !color) return false;
 
@@ -116,7 +120,6 @@ export default function ChessGame({ user, roomId }) {
     return true;
   };
 
-  /* ---------------- GAME STATE ---------------- */
   const isGameOver = gameRef.current.isGameOver();
   const isCheck = gameRef.current.isCheck();
   const turn = gameRef.current.turn();
@@ -126,24 +129,30 @@ export default function ChessGame({ user, roomId }) {
     winner = turn === "w" ? "Black" : "White";
   }
 
-  /* ---------------- UI ---------------- */
   return (
     <div className="chess-page">
       <h2 className="title">♟️ Online Chess</h2>
 
       <div className="info-card">
         <p><strong>Player:</strong> {user.displayName}</p>
+
         <p>
           <strong>Room:</strong>{" "}
           <span className="highlight-green">{roomId}</span>
+          <button className="copy-btn" onClick={copyRoomId}>
+            {copied ? "✔ Copied" : "📋 Copy"}
+          </button>
         </p>
+
         <p>
           <strong>Your Color:</strong>{" "}
           <span className={color ? "highlight-green" : "highlight-wait"}>
             {color || "Waiting..."}
           </span>
         </p>
+
         <p><strong>Mode:</strong> {mode || "Waiting..."}</p>
+
         <p>
           <strong>Current Turn:</strong>{" "}
           {turn === "w" ? "White ⚪" : "Black ⚫"}
@@ -189,10 +198,7 @@ export default function ChessGame({ user, roomId }) {
         />
       </div>
 
-      <button
-        className="leave-btn"
-        onClick={() => window.location.reload()}
-      >
+      <button className="leave-btn" onClick={() => window.location.reload()}>
         🚪 Leave Game
       </button>
     </div>
