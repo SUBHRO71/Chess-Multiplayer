@@ -1,0 +1,107 @@
+.lobby-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #1a1c23;
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
+  position: relative;
+}
+
+.mouse-glow {
+  position: fixed;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+.lobby-card {
+  position: relative;
+  z-index: 2;
+  background: #ffffff;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  width: 90%;
+  max-width: 450px;
+}
+
+h2, h3 { color: #111; margin-bottom: 1rem; }
+.highlight { color: #28a745; font-weight: bold; }
+
+
+.primary-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #28a745; 
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 10px;
+}
+
+.secondary-btn {
+  flex: 1;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.secondary-btn:hover { background-color: #e9ecef; border-color: #dee2e6; }
+.primary-btn:hover { background-color: #218838; transform: translateY(-2px); }
+
+.back-btn {
+  background: none;
+  border: none;
+  color: #666;
+  text-decoration: underline;
+  margin-top: 15px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.input-group { display: flex; flex-direction: column; gap: 10px; }
+
+input {
+  padding: 12px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  outline: none;
+}
+
+input:focus { border-color: #28a745; }
+
+.button-group { display: flex; gap: 10px; margin-top: 10px; }
+
+.divider {
+  margin: 30px 0;
+  position: relative;
+  border-bottom: 1px solid #eee;
+}
+
+.divider span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 0 15px;
+  color: #aaa;
+  font-size: 0.8rem;
+}

@@ -15,9 +15,16 @@ export default function ChessGame({ user, roomId }) {
   const [whiteTime, setWhiteTime] = useState(300);
   const [blackTime, setBlackTime] = useState(300);
   const [copied, setCopied] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   const timerRef = useRef(null);
   const lastUpdateRef = useRef(Date.now());
+
+  useEffect(() => {
+    const handleMove = (e) => setMousePos({ x: e.clientX, y: e.clientY });
+    window.addEventListener("mousemove", handleMove);
+    return () => window.removeEventListener("mousemove", handleMove);
+  }, []);
 
   const copyRoomId = async () => {
     await navigator.clipboard.writeText(roomId);
@@ -131,76 +138,93 @@ export default function ChessGame({ user, roomId }) {
 
   return (
     <div className="chess-page">
-      <h2 className="title">♟️ Online Chess</h2>
+      <div 
+        className="mouse-glow" 
+        style={{ left: `${mousePos.x}px`, top: `${mousePos.y}px` }}
+      />
 
-      <div className="info-card">
-        <p><strong>Player:</strong> {user.displayName}</p>
+      <div className="game-layout">
+        <div className="sidebar">
+          <h2 className="title">♟️ Online Chess</h2>
 
-        <p>
-          <strong>Room:</strong>{" "}
-          <span className="highlight-green">{roomId}</span>
-          <button className="copy-btn" onClick={copyRoomId}>
-            {copied ? "✔ Copied" : "📋 Copy"}
+          <div className="info-card">
+            <div className="info-item">
+              <span>Player</span>
+              <strong>{user.displayName}</strong>
+            </div>
+            <div className="info-item">
+              <span>Room ID</span>
+              <div className="room-row">
+                <strong className="highlight-green">{roomId}</strong>
+                <button className="copy-btn" onClick={copyRoomId}>
+                  {copied ? "✔" : "📋"}
+                </button>
+              </div>
+            </div>
+            <div className="info-item">
+              <span>Your Color</span>
+              <strong className={color ? "highlight-green" : ""}>
+                {color ? color.charAt(0).toUpperCase() + color.slice(1) : "Waiting..."}
+              </strong>
+            </div>
+            <div className="info-item">
+              <span>Mode</span>
+              <strong className="capitalize">{mode || "Waiting..."}</strong>
+            </div>
+          </div>
+
+          {mode === "rapid" && (
+            <div className="timer-container">
+              <div className={`time-box ${turn === "w" ? "active" : ""}`}>
+                <span className="dot">⚪</span>
+                {Math.floor(whiteTime / 60)}:{String(whiteTime % 60).padStart(2, "0")}
+              </div>
+              <div className={`time-box ${turn === "b" ? "active" : ""}`}>
+                <span className="dot">⚫</span>
+                {Math.floor(blackTime / 60)}:{String(blackTime % 60).padStart(2, "0")}
+              </div>
+            </div>
+          )}
+
+          <button className="leave-btn" onClick={() => window.location.reload()}>
+            Leave Game
           </button>
-        </p>
-
-        <p>
-          <strong>Your Color:</strong>{" "}
-          <span className={color ? "highlight-green" : "highlight-wait"}>
-            {color || "Waiting..."}
-          </span>
-        </p>
-
-        <p><strong>Mode:</strong> {mode || "Waiting..."}</p>
-
-        <p>
-          <strong>Current Turn:</strong>{" "}
-          {turn === "w" ? "White ⚪" : "Black ⚫"}
-        </p>
-      </div>
-
-      {mode === "rapid" && (
-        <div className="timer">
-          <span className={turn === "w" ? "active-turn" : "inactive-turn"}>
-            ⚪ {Math.floor(whiteTime / 60)}:
-            {String(whiteTime % 60).padStart(2, "0")}
-          </span>
-          |
-          <span className={turn === "b" ? "active-turn" : "inactive-turn"}>
-            ⚫ {Math.floor(blackTime / 60)}:
-            {String(blackTime % 60).padStart(2, "0")}
-          </span>
         </div>
-      )}
 
-      {!started && <p className="waiting">⏳ Waiting for opponent…</p>}
+        <div className="main-board">
+          {isCheck && !isGameOver && <div className="check-badge">CHECK!</div>}
+          
+          {isGameOver && (
+            <div className="overlay">
+              <div className="game-over-card">
+                <h3>🏁 Game Over</h3>
+                {winner ? <p>👑 {winner} wins by checkmate!</p> : <p>Draw!</p>}
+                <button className="primary-btn" onClick={() => window.location.reload()}>Back to Lobby</button>
+              </div>
+            </div>
+          )}
 
-      {isCheck && !isGameOver && (
-        <p className="check-warning">!!--CHECK--!!</p>
-      )}
+          {!started && (
+            <div className="overlay">
+              <div className="waiting-card">
+                <div className="spinner"></div>
+                <p>Waiting for opponent…</p>
+              </div>
+            </div>
+          )}
 
-      {isGameOver && (
-        <div className="game-over">
-          <p>🏁 Game Over!</p>
-          {winner && <p>👑 {winner} wins by checkmate!</p>}
-          {gameRef.current.isDraw() && <p>🤝 Draw!</p>}
-          {gameRef.current.isStalemate() && <p>😐 Stalemate!</p>}
+          <div className="board-wrapper">
+            <Chessboard
+              position={fen}
+              boardOrientation={color || "white"}
+              onPieceDrop={onPieceDrop}
+              boardWidth={580}
+              customDarkSquareStyle={{ backgroundColor: "#311B92" }}
+              customLightSquareStyle={{ backgroundColor: "#E1F5FE" }}
+            />
+          </div>
         </div>
-      )}
-
-      <div className="board-container">
-        <Chessboard
-          position={fen}
-          boardOrientation={color || "white"}
-          onPieceDrop={onPieceDrop}
-          boardWidth={600}
-          animationDuration={200}
-        />
       </div>
-
-      <button className="leave-btn" onClick={() => window.location.reload()}>
-        🚪 Leave Game
-      </button>
     </div>
   );
 }
